@@ -1,0 +1,61 @@
+data = np.array(list({2, 4, 6, 8, 10,  14, 20, 28, 38}))
+
+#1
+indexes_sorted = np.argsort(data, kind='mergesort')
+data_sorted = data[indexes_sorted]
+
+#2
+data_sorted_diff = np.diff(data_sorted)
+pair_dist_args_sorted = np.argsort(data_sorted_diff, kind='mergesort')
+
+#3
+all_pairs = np.repeat(indexes_sorted, 2)[1:-1].reshape(data.shape[0]-1, 2)
+sorted_pairs = all_pairs[pair_dist_args_sorted]
+pair_dist_sorted = data_sorted_diff[pair_dist_args_sorted]
+
+def make_compile_cluster(cluster_smaller, cluster_bigger):
+    list_change = list()
+    for elem in cluster_smaller:
+        cluster_bigger.add(elem)
+        list_change.append(elem)
+    return list_change
+
+elems_in_clusters = dict()
+
+M = 15 #constant to stop union
+#4
+for i, pair in enumerate(sorted_pairs):
+    if pair_dist_sorted[i] > M:
+        break
+    
+    cl_1 = elems_in_clusters.get(pair[0])
+    cl_2 = elems_in_clusters.get(pair[1])
+
+    #5
+    if cl_1 and cl_2:
+        if len(cl_1) > len(cl_2):
+            to_change = make_compile_cluster(cl_2, cl_1)
+            cl_2 = cl_1
+        else:
+            to_change = make_compile_cluster(cl_1, cl_2)
+            cl_1 = cl_2
+        
+        for elem in to_change:
+            elems_in_clusters[elem] = cl_1
+    
+    #6
+    elif cl_1:
+        cl_1.add(pair[1])
+        elems_in_clusters[pair[1]] = cl_1
+    
+    elif cl_2:
+        cl_2.add(pair[0])
+        elems_in_clusters[pair[0]] = cl_2
+        
+    else:
+        new_cluster = set(pair)
+        elems_in_clusters[pair[0]] = new_cluster
+        elems_in_clusters[pair[1]] = new_cluster
+    
+    print(elems_in_clusters)
+    print('---------------------')
