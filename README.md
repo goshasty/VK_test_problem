@@ -1,2 +1,3 @@
 # VK_test_problem
-solution for test problem
+Представлено решения первой задачи отбора на стажировку VK
+Демин Георгий МГУ goshasy@yandex.ru
